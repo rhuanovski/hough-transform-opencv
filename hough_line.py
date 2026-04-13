@@ -1,47 +1,83 @@
 import cv2
 import numpy as np
+import os
 
-# caminho da imagem
-imagem = cv2.imread("circulo.jpg")
+# pasta de entrada e saída
+pasta_entrada = "img"
+pasta_saida = "resultado_line"
 
-if imagem is None:
-    raise FileNotFoundError("Não foi possível abrir 'circulo.jpg'.")
+# cria a pasta de saída, se não existir
+os.makedirs(pasta_saida, exist_ok=True)
 
-# cópia para desenhar
-resultado = imagem.copy()
+# extensões permitidas
+extensoes_validas = (".jpg", ".jpeg", ".png", ".bmp", ".webp")
 
-# escala de cinza
-gray = cv2.cvtColor(imagem, cv2.COLOR_BGR2GRAY)
+# lista os arquivos de imagem
+arquivos_imagem = [
+    arquivo for arquivo in os.listdir(pasta_entrada)
+    if arquivo.lower().endswith(extensoes_validas)
+]
 
-# suavização para reduzir ruído
-blur = cv2.GaussianBlur(gray, (5, 5), 0)
+if not arquivos_imagem:
+    print(f"Nenhuma imagem encontrada na pasta '{pasta_entrada}'.")
+    exit()
 
-# detector de bordas
-bordas = cv2.Canny(blur, 50, 150)
+print(f"Foram encontradas {len(arquivos_imagem)} imagem(ns).")
+print()
 
-# Transformada de Hough probabilística
-linhas = cv2.HoughLinesP(
-    bordas,
-    rho=1,
-    theta=np.pi / 180,
-    threshold=80,
-    minLineLength=50,
-    maxLineGap=10
-)
+for nome_arquivo in arquivos_imagem:
+    caminho_imagem = os.path.join(pasta_entrada, nome_arquivo)
 
-# desenha as linhas encontradas
-if linhas is not None:
-    for linha in linhas:
-        x1, y1, x2, y2 = linha[0]
-        cv2.line(resultado, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    imagem = cv2.imread(caminho_imagem)
 
-# salva resultados
-cv2.imwrite("1_gray.jpg", gray)
-cv2.imwrite("2_bordas.jpg", bordas)
-cv2.imwrite("3_resultado_hough.jpg", resultado)
+    if imagem is None:
+        print(f"Não foi possível abrir '{caminho_imagem}'. Pulando arquivo.")
+        continue
 
-print("Processamento concluído.")
-print("Arquivos gerados:")
-print("- 1_gray.jpg")
-print("- 2_bordas.jpg")
-print("- 3_resultado_hough.jpg")
+    nome_base = os.path.splitext(nome_arquivo)[0]
+
+    # cópia para desenhar
+    resultado = imagem.copy()
+
+    # escala de cinza
+    gray = cv2.cvtColor(imagem, cv2.COLOR_BGR2GRAY)
+
+    # suavização para reduzir ruído
+    blur = cv2.GaussianBlur(gray, (5, 5), 0)
+
+    # detector de bordas
+    bordas = cv2.Canny(blur, 50, 150)
+
+    # Transformada de Hough probabilística
+    linhas = cv2.HoughLinesP(
+        bordas,
+        rho=1,
+        theta=np.pi / 180,
+        threshold=80,
+        minLineLength=50,
+        maxLineGap=10
+    )
+
+    # desenha as linhas encontradas
+    if linhas is not None:
+        for linha in linhas:
+            x1, y1, x2, y2 = linha[0]
+            cv2.line(resultado, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+    # nomes dos arquivos de saída
+    arquivo_gray = os.path.join(pasta_saida, f"{nome_base}_gray.jpg")
+    arquivo_bordas = os.path.join(pasta_saida, f"{nome_base}_bordas.jpg")
+    arquivo_resultado = os.path.join(pasta_saida, f"{nome_base}_resultado_hough.jpg")
+
+    # salva resultados
+    cv2.imwrite(arquivo_gray, gray)
+    cv2.imwrite(arquivo_bordas, bordas)
+    cv2.imwrite(arquivo_resultado, resultado)
+
+    print(f"Imagem processada: {nome_arquivo}")
+    print(f"  - {arquivo_gray}")
+    print(f"  - {arquivo_bordas}")
+    print(f"  - {arquivo_resultado}")
+    print()
+
+print("Processamento em lote concluído.")
