@@ -2,10 +2,10 @@ import cv2
 import numpy as np
 
 # caminho da imagem
-imagem = cv2.imread("imagem_quadro.jpg")
+imagem = cv2.imread("circulo.jpg")
 
 if imagem is None:
-    raise FileNotFoundError("Não foi possível abrir 'imagem_quadro.jpg'.")
+    raise FileNotFoundError("Não foi possível abrir 'circulo.jpg'.")
 
 # cópia para desenhar
 resultado = imagem.copy()
