@@ -4,7 +4,7 @@ import os
 import math
 
 # pasta de entrada e saída
-pasta_entrada = "img"
+pasta_entrada = "img_line"
 pasta_saida = "resultado_line"
 
 # cria a pasta de saída, se não existir
