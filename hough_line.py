@@ -24,7 +24,7 @@ HOUGH_MIN_LINE_LENGTH = 50
 HOUGH_MAX_LINE_GAP = 10
 
 # confiança mínima para aceitar a linha
-CONFIANCA_MINIMA = 0.50
+CONFIANCA_MINIMA = 0.30
 
 
 def limitar(valor, minimo=0.0, maximo=1.0):
